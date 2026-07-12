@@ -1,0 +1,1758 @@
+{
+  "info": {
+    "name": "AssetFlow API",
+    "description": "Complete API collection for AssetFlow Enterprise Asset & Resource Management ERP — Sprint 1, Sprint 2, Sprint 3 & Sprint 4",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "assetflow-api-collection"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints — signup, login, logout, password reset, and profile",
+      "item": [
+        {
+          "name": "Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@company.com\",\n  \"password\": \"SecurePass@123\",\n  \"confirmPassword\": \"SecurePass@123\",\n  \"department\": \"665a1b2c3d4e5f6789012345\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/signup",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "signup"]
+            },
+            "description": "Register a new user account. Default role is 'employee'."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.data.token);",
+                  "    console.log('Token saved successfully');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@assetflow.com\",\n  \"password\": \"Admin@123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login with email and password. Token is automatically saved to collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get the currently authenticated user's profile."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Logout the current user and clear the auth cookie."
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@company.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "forgot-password"]
+            },
+            "description": "Request a password reset email. A reset token will be sent to the provided email."
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"NewSecure@456\",\n  \"confirmPassword\": \"NewSecure@456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password/:token",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "reset-password", ":token"],
+              "variable": [
+                {
+                  "key": "token",
+                  "value": "paste-reset-token-here",
+                  "description": "Password reset token from email"
+                }
+              ]
+            },
+            "description": "Reset password using the token received via email."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Departments",
+      "description": "Department management endpoints — CRUD and activation controls",
+      "item": [
+        {
+          "name": "Create Department",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Engineering\",\n  \"code\": \"ENG\",\n  \"description\": \"Software engineering and development team\",\n  \"location\": \"Building A, 4th Floor\",\n  \"budget\": 150000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/departments",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments"]
+            },
+            "description": "Create a new department. Requires admin role."
+          },
+          "response": []
+        },
+        {
+          "name": "List Departments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List all departments. Available to any authenticated user."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Department",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012345",
+                  "description": "Department ID"
+                }
+              ]
+            },
+            "description": "Get a single department by ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Department",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Engineering & DevOps\",\n  \"description\": \"Software engineering, development, and DevOps team\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/departments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012345",
+                  "description": "Department ID"
+                }
+              ]
+            },
+            "description": "Update a department. Requires admin role."
+          },
+          "response": []
+        },
+        {
+          "name": "Activate Department",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/:id/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", ":id", "activate"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012345",
+                  "description": "Department ID"
+                }
+              ]
+            },
+            "description": "Activate a deactivated department. Requires admin role."
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate Department",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/departments/:id/deactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["departments", ":id", "deactivate"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012345",
+                  "description": "Department ID"
+                }
+              ]
+            },
+            "description": "Deactivate a department. Requires admin role."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Asset Categories",
+      "description": "Asset category management endpoints — CRUD and activation controls",
+      "item": [
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Laptops\",\n  \"code\": \"LAP\",\n  \"description\": \"Portable computing devices including laptops and notebooks\",\n  \"depreciationRate\": 25,\n  \"usefulLifeYears\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/asset-categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["asset-categories"]
+            },
+            "description": "Create a new asset category. Requires admin role."
+          },
+          "response": []
+        },
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/asset-categories",
+              "host": ["{{baseUrl}}"],
+              "path": ["asset-categories"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List all asset categories. Available to any authenticated user."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/asset-categories/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["asset-categories", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012350",
+                  "description": "Category ID"
+                }
+              ]
+            },
+            "description": "Get a single asset category by ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Laptops & Tablets\",\n  \"description\": \"Portable computing devices including laptops, notebooks, and tablets\",\n  \"depreciationRate\": 30\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/asset-categories/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["asset-categories", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012350",
+                  "description": "Category ID"
+                }
+              ]
+            },
+            "description": "Update an asset category. Requires admin role."
+          },
+          "response": []
+        },
+        {
+          "name": "Activate Category",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/asset-categories/:id/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["asset-categories", ":id", "activate"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012350",
+                  "description": "Category ID"
+                }
+              ]
+            },
+            "description": "Activate a deactivated asset category. Requires admin role."
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate Category",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/asset-categories/:id/deactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["asset-categories", ":id", "deactivate"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012350",
+                  "description": "Category ID"
+                }
+              ]
+            },
+            "description": "Deactivate an asset category. Requires admin role."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Employees",
+      "description": "Employee directory management endpoints",
+      "item": [
+        {
+          "name": "List Employees",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employees",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "department",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "role",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List all employees. Requires admin or asset_manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Employee",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employees/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012346",
+                  "description": "Employee ID"
+                }
+              ]
+            },
+            "description": "Get employee by ID. Requires admin or asset_manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Employee",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jonathan\",\n  \"department\": \"665a1b2c3d4e5f6789012348\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012346",
+                  "description": "Employee ID"
+                }
+              ]
+            },
+            "description": "Update employee. Requires admin role."
+          },
+          "response": []
+        },
+        {
+          "name": "Promote Employee",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"department_head\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees/:id/promote",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":id", "promote"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012346",
+                  "description": "Employee ID"
+                }
+              ]
+            },
+            "description": "Promote employee. Requires admin role."
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate Employee",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employees/:id/deactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":id", "deactivate"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a1b2c3d4e5f6789012346",
+                  "description": "Employee ID"
+                }
+              ]
+            },
+            "description": "Deactivate employee. Requires admin role."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "description": "Dashboard stats",
+      "item": [
+        {
+          "name": "Get Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "stats"]
+            },
+            "description": "Get dashboard statistics."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Assets",
+      "description": "Asset registry management endpoints",
+      "item": [
+        {
+          "name": "Register Asset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MacBook Pro 16\",\n  \"serialNumber\": \"MAC-PRO-999\",\n  \"category\": \"665a1b2c3d4e5f6789012350\",\n  \"acquisitionDate\": \"2024-02-10T00:00:00.000Z\",\n  \"acquisitionCost\": 2499.00,\n  \"condition\": \"new\",\n  \"location\": \"Office A, Desk 13\",\n  \"isBookable\": false,\n  \"description\": \"M3 Pro MacBook Pro 16 inch Space Grey\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assets",
+              "host": ["{{baseUrl}}"],
+              "path": ["assets"]
+            },
+            "description": "Register a new asset. Requires admin or asset_manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "List Assets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assets",
+              "host": ["{{baseUrl}}"],
+              "path": ["assets"]
+            },
+            "description": "Get all assets with filtering, searching, and pagination."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Asset Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assets/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["assets", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a2b3c4d5e6f7890123401"
+                }
+              ]
+            },
+            "description": "Get detailed information of a single asset including allocation/transfer history."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Asset Details",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MacBook Pro 16 (Upgraded)\",\n  \"location\": \"Office A, Desk 14\",\n  \"condition\": \"good\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/assets/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["assets", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a2b3c4d5e6f7890123401"
+                }
+              ]
+            },
+            "description": "Update asset attributes. Requires admin or asset_manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Retire Asset",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assets/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["assets", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a2b3c4d5e6f7890123401"
+                }
+              ]
+            },
+            "description": "Retire/Soft delete an asset. Requires admin or asset_manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Summary metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/assets/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["assets", "summary"]
+            },
+            "description": "Get summary metrics. Requires admin or asset_manager role."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Allocations",
+      "description": "Asset allocation and returns management",
+      "item": [
+        {
+          "name": "Checkout / Allocate Asset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asset\": \"665a2b3c4d5e6f7890123401\",\n  \"allocateToType\": \"User\",\n  \"allocatedTo\": \"665a1b2c3d4e5f6789012346\",\n  \"checkOutCondition\": \"new\",\n  \"expectedReturnDate\": \"2026-10-12T09:05:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/allocations/checkout",
+              "host": ["{{baseUrl}}"],
+              "path": ["allocations", "checkout"]
+            },
+            "description": "Allocate an asset to a user or department. Requires admin or asset_manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Check-in / Return Asset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"checkInCondition\": \"good\",\n  \"checkInNotes\": \"Returned in good condition.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/allocations/check-in/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["allocations", "check-in", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a2b3c4d5e6f7890123402"
+                }
+              ]
+            },
+            "description": "Record an asset return. Requires admin or asset_manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Overdue Allocations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/allocations/overdue",
+              "host": ["{{baseUrl}}"],
+              "path": ["allocations", "overdue"]
+            },
+            "description": "List overdue checkout allocations. Requires admin or asset_manager role."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Transfers",
+      "description": "Asset transfer requests and approval workflow",
+      "item": [
+        {
+          "name": "Request Transfer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asset\": \"665a2b3c4d5e6f7890123401\",\n  \"toUser\": \"665a1b2c3d4e5f6789012347\",\n  \"requestReason\": \"Project requirements\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transfers/request",
+              "host": ["{{baseUrl}}"],
+              "path": ["transfers", "request"]
+            },
+            "description": "Request transfer of an allocated asset to another employee."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Transfer Request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transfers/:id/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["transfers", ":id", "approve"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a2b3c4d5e6f7890123409"
+                }
+              ]
+            },
+            "description": "Approve a transfer request. Enforces self-approval blocks."
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Transfer Request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Asset required elsewhere\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transfers/:id/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["transfers", ":id", "reject"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a2b3c4d5e6f7890123409"
+                }
+              ]
+            },
+            "description": "Reject a transfer request."
+          },
+          "response": []
+        },
+        {
+          "name": "List Transfers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transfers",
+              "host": ["{{baseUrl}}"],
+              "path": ["transfers"]
+            },
+            "description": "Get all transfer requests."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "description": "Resource bookings and rescheduling — Sprint 3",
+      "item": [
+        {
+          "name": "Create Booking Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"665a2b3c4d5e6f7890123405\",\n  \"startDateTime\": \"2026-07-14T10:00:00.000Z\",\n  \"endDateTime\": \"2026-07-14T12:00:00.000Z\",\n  \"purpose\": \"Project sync meeting\",\n  \"notes\": \"Requires white board.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            },
+            "description": "Reserve a shared/bookable asset."
+          },
+          "response": []
+        },
+        {
+          "name": "Reschedule Booking",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDateTime\": \"2026-07-15T10:00:00.000Z\",\n  \"endDateTime\": \"2026-07-15T12:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings/:id/reschedule",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", ":id", "reschedule"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a3c4d5e6f789012345001"
+                }
+              ]
+            },
+            "description": "Reschedule an upcoming booking."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bookings/:id/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", ":id", "cancel"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a3c4d5e6f789012345001"
+                }
+              ]
+            },
+            "description": "Cancel an upcoming booking."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Resource History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bookings/resource/:resourceId",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "resource", ":resourceId"],
+              "variable": [
+                {
+                  "key": "resourceId",
+                  "value": "665a2b3c4d5e6f7890123405"
+                }
+              ]
+            },
+            "description": "Retrieve booking history for a specific resource."
+          },
+          "response": []
+        },
+        {
+          "name": "List Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            },
+            "description": "List all bookings with filters."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "description": "Asset repairs and workflow status transitions — Sprint 3",
+      "item": [
+        {
+          "name": "Raise Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asset\": \"665a2b3c4d5e6f7890123401\",\n  \"issueDescription\": \"Screen flickers randomly and device runs extremely hot\",\n  \"priority\": \"high\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/maintenance",
+              "host": ["{{baseUrl}}"],
+              "path": ["maintenance"]
+            },
+            "description": "Submit a new maintenance ticket."
+          },
+          "response": []
+        },
+        {
+          "name": "Transition Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/maintenance/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["maintenance", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a3c4d5e6f789012345020"
+                }
+              ]
+            },
+            "description": "Transition maintenance request status. Example: status can be: approved, rejected, technician_assigned, in_progress, resolved."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Asset History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/maintenance/asset/:assetId",
+              "host": ["{{baseUrl}}"],
+              "path": ["maintenance", "asset", ":assetId"],
+              "variable": [
+                {
+                  "key": "assetId",
+                  "value": "665a2b3c4d5e6f7890123401"
+                }
+              ]
+            },
+            "description": "Get maintenance ticket history list for an asset."
+          },
+          "response": []
+        },
+        {
+          "name": "List Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/maintenance",
+              "host": ["{{baseUrl}}"],
+              "path": ["maintenance"]
+            },
+            "description": "List all maintenance tickets."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "description": "轻量级通知系统 endpoints — Sprint 3",
+      "item": [
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"],
+              "query": [
+                {
+                  "key": "read",
+                  "value": "false",
+                  "description": "Filter by read status"
+                }
+              ]
+            },
+            "description": "Fetch user's alerts."
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/:id/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", ":id", "read"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a3c4d5e6f789012345050"
+                }
+              ]
+            },
+            "description": "Mark notification as read."
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/read-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "read-all"]
+            },
+            "description": "Mark all alerts as read."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Activity Logs",
+      "description": "Admin auditable system log listings — Sprint 3",
+      "item": [
+        {
+          "name": "Get Activity Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/activity-logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["activity-logs"]
+            },
+            "description": "Get audit logs. Requires admin or asset_manager role."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Audits",
+      "description": "Asset verification audit cycles — Sprint 4",
+      "item": [
+        {
+          "name": "Create Audit Cycle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Q3 Office A Verification Audit\",\n  \"location\": \"Office A\",\n  \"startDate\": \"2026-07-12T00:00:00.000Z\",\n  \"endDate\": \"2026-07-19T23:59:59.000Z\",\n  \"auditors\": [\"665a1b2c3d4e5f6789012340\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/audits",
+              "host": ["{{baseUrl}}"],
+              "path": ["audits"]
+            },
+            "description": "Create a new audit cycle in draft status. Requires admin or asset_manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Start Audit Cycle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/audits/:id/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["audits", ":id", "start"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a4d5e6f78901234567001"
+                }
+              ]
+            },
+            "description": "Start a draft audit cycle to make it active. Requires admin or asset_manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Scoped Asset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"missing\",\n  \"notes\": \"Asset missing from designated room.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/audits/:id/verify/:assetId",
+              "host": ["{{baseUrl}}"],
+              "path": ["audits", ":id", "verify", ":assetId"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a4d5e6f78901234567001"
+                },
+                {
+                  "key": "assetId",
+                  "value": "665a2b3c4d5e6f7890123401"
+                }
+              ]
+            },
+            "description": "Submit auditor verification report for an asset in an active cycle."
+          },
+          "response": []
+        },
+        {
+          "name": "Close Audit Cycle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/audits/:id/close",
+              "host": ["{{baseUrl}}"],
+              "path": ["audits", ":id", "close"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a4d5e6f78901234567001"
+                }
+              ]
+            },
+            "description": "Close and finalize active audit cycle. Requires admin or asset_manager role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Discrepancy Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/audits/:id/discrepancies",
+              "host": ["{{baseUrl}}"],
+              "path": ["audits", ":id", "discrepancies"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a4d5e6f78901234567001"
+                }
+              ]
+            },
+            "description": "Retrieve all assets marked missing or damaged in this cycle."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Cycle Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/audits/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["audits", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "665a4d5e6f78901234567001"
+                }
+              ]
+            },
+            "description": "Retrieve full details and items of a cycle."
+          },
+          "response": []
+        },
+        {
+          "name": "List Audit Cycles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/audits",
+              "host": ["{{baseUrl}}"],
+              "path": ["audits"]
+            },
+            "description": "List audit cycles with pagination."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "description": "MongoDB Aggregation-based reports — Sprint 4",
+      "item": [
+        {
+          "name": "Utilization Trends",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/utilization",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "utilization"]
+            },
+            "description": "Get monthly allocation and active count trends. Send format=csv query param for CSV download."
+          },
+          "response": []
+        },
+        {
+          "name": "Usage Comparison",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/usage-comparison",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "usage-comparison"]
+            },
+            "description": "Compare most checked-out assets vs idle assets."
+          },
+          "response": []
+        },
+        {
+          "name": "Maintenance Frequency",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/maintenance-frequency",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "maintenance-frequency"]
+            },
+            "description": "Get maintenance ticket counts by asset."
+          },
+          "response": []
+        },
+        {
+          "name": "Retirement Forecast",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/retirement-forecast",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "retirement-forecast"]
+            },
+            "description": "Retrieve assets nearing retirement or useful life end."
+          },
+          "response": []
+        },
+        {
+          "name": "Department Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/departments-summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "departments-summary"]
+            },
+            "description": "Get summary counts and values assigned per department."
+          },
+          "response": []
+        },
+        {
+          "name": "Bookings Heatmap",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/bookings-heatmap",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "bookings-heatmap"]
+            },
+            "description": "Identify peak booking timeframes."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
