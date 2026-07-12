@@ -14,20 +14,18 @@ const {
 const validate = require('../middlewares/validate');
 const { protect, authorize } = require('../middlewares/auth');
 
-// All routes require authentication
-router.use(protect);
-
+// All routes except GET / require authentication
 router
   .route('/')
-  .post(authorize('admin'), createCategoryRules, validate, createCategory)
+  .post(protect, authorize('admin'), createCategoryRules, validate, createCategory)
   .get(getCategories);
 
 router
   .route('/:id')
-  .get(getCategory)
-  .put(authorize('admin'), updateCategoryRules, validate, updateCategory);
+  .get(protect, getCategory)
+  .put(protect, authorize('admin'), updateCategoryRules, validate, updateCategory);
 
-router.patch('/:id/activate', authorize('admin'), activateCategory);
-router.patch('/:id/deactivate', authorize('admin'), deactivateCategory);
+router.patch('/:id/activate', protect, authorize('admin'), activateCategory);
+router.patch('/:id/deactivate', protect, authorize('admin'), deactivateCategory);
 
 module.exports = router;

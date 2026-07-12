@@ -14,20 +14,18 @@ const {
 const validate = require('../middlewares/validate');
 const { protect, authorize } = require('../middlewares/auth');
 
-// All routes require authentication
-router.use(protect);
-
+// All routes except GET / require authentication
 router
   .route('/')
-  .post(authorize('admin'), createDepartmentRules, validate, createDepartment)
+  .post(protect, authorize('admin'), createDepartmentRules, validate, createDepartment)
   .get(getDepartments);
 
 router
   .route('/:id')
-  .get(getDepartment)
-  .put(authorize('admin'), updateDepartmentRules, validate, updateDepartment);
+  .get(protect, getDepartment)
+  .put(protect, authorize('admin'), updateDepartmentRules, validate, updateDepartment);
 
-router.patch('/:id/activate', authorize('admin'), activateDepartment);
-router.patch('/:id/deactivate', authorize('admin'), deactivateDepartment);
+router.patch('/:id/activate', protect, authorize('admin'), activateDepartment);
+router.patch('/:id/deactivate', protect, authorize('admin'), deactivateDepartment);
 
 module.exports = router;

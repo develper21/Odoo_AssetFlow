@@ -3,6 +3,7 @@ const {
   allocateAsset,
   returnAsset,
   getOverdueAllocations,
+  getAllAllocations,
 } = require('../controllers/allocation.controller');
 const { allocateRules, returnRules } = require('../validators/allocation.validator');
 const validate = require('../middlewares/validate');
@@ -11,6 +12,8 @@ const { USER_ROLES } = require('../constants');
 
 // Apply protection to all allocation routes
 router.use(protect);
+
+router.get('/', getAllAllocations);
 
 router.get(
   '/overdue',
