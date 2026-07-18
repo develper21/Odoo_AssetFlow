@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import {
   LayoutDashboard, Boxes, Users, Building2, Tag, CalendarCheck, Wrench,
@@ -43,7 +43,7 @@ export function AppLayout() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (hydrated && !user) navigate({ to: "/" });
+    if (hydrated && !user) navigate("/");
   }, [hydrated, user, navigate]);
 
   const items = useMemo(
@@ -112,7 +112,7 @@ export function AppLayout() {
           <button
             onClick={() => {
               logout();
-              navigate({ to: "/" });
+              navigate("/");
             }}
             className="mt-4 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground"
           >
