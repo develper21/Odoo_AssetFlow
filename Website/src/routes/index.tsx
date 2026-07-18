@@ -1,14 +1,10 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useSession, type Role } from "@/lib/session";
 import { Moon, Sun, ShieldCheck, Boxes, LayoutDashboard, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { authApi } from "@/lib/api";
 import { toast } from "sonner";
-
-export const Route = createFileRoute("/")({
-  component: LoginPage,
-});
 
 const ROLES: { role: Role; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { role: "admin", label: "Admin", icon: ShieldCheck },
@@ -26,7 +22,7 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (hydrated && user) navigate({ to: "/dashboard" });
+    if (hydrated && user) navigate("/dashboard");
   }, [hydrated, user, navigate]);
 
   const submit = async (e: React.FormEvent) => {
@@ -51,7 +47,7 @@ function LoginPage() {
       };
       login(userData, response.token);
       toast.success("Login successful");
-      navigate({ to: "/dashboard" });
+      navigate("/dashboard");
     } catch (error: any) {
       console.error('Login failed:', error);
       toast.error(error.message || "Login failed. Please check your credentials.");
@@ -168,14 +164,14 @@ function LoginPage() {
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <button 
                 type="button" 
-                onClick={() => navigate({ to: "/forgot-password" as any })}
+                onClick={() => navigate("/forgot-password")}
                 className="hover:text-foreground"
               >
                 Forgot password?
               </button>
               <button 
                 type="button" 
-                onClick={() => navigate({ to: "/signup" as any })}
+                onClick={() => navigate("/signup")}
                 className="hover:text-foreground"
               >
                 Employee sign up
@@ -187,3 +183,5 @@ function LoginPage() {
     </div>
   );
 }
+
+export default LoginPage;
